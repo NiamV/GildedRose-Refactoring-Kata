@@ -5,39 +5,44 @@ class GildedRose(object):
     def __init__(self, items):
         self.items = items
 
-    def increase_backstage_quality(self, item):
+    @staticmethod
+    def increase_backstage_quality(item):
         if item.sell_in < 0:
-            item.quality = 0
+            return item.quality * -1
         elif item.sell_in < 5:
-                item.quality = min(item.quality + 3, 50)
+            return 3
         elif item.sell_in < 10:
-                item.quality = min(item.quality + 2, 50)
+            return 2
         else:
-            item.quality = min(item.quality + 1, 50)
-
+            return 1
 
     def update_quality(self):
         improving_items = ["Aged Brie", "Backstage passes to a TAFKAL80ETC concert"]
         constant_items = ["Sulfuras, Hand of Ragnaros"]
 
         for item in self.items:
+            # advance time
             if item.name != "Sulfuras, Hand of Ragnaros":
                 item.sell_in = item.sell_in - 1
-
-            if (not item.name in improving_items + constant_items) and item.quality > 0:
-                item.quality = item.quality - 1
-
-            elif not item.name in constant_items:
-                if item.quality < 50 and item.name != "Backstage passes to a TAFKAL80ETC concert":
-                    item.quality = item.quality + 1
-                else:
-                    self.increase_backstage_quality(item)
-
+            # set degrade speed based on item type and sell by date
+            degrade_speed = 1
+            if item.name == "Conjured":
+                degrade_speed *= 2
             if item.sell_in < 0:
-                if (not item.name in improving_items + constant_items) and item.quality > 0:
-                    item.quality = item.quality - 1
-                elif item.quality < 50 and item.name != "Backstage passes to a TAFKAL80ETC concert":
-                    item.quality = item.quality + 1
+                degrade_speed *= 2
+
+            # standard items degrade
+            if not item.name in improving_items + constant_items:
+                degrade_speed *= -1
+
+            # set degrade speed differently for special items
+            if item.name == "Backstage passes to a TAFKAL80ETC concert":
+                degrade_speed = self.increase_backstage_quality(item)
+
+            if item.name == "Sulfuras, Hand of Ragnaros":
+                degrade_speed = 0
+            # set item quality (to between 0 and 50) according to degrade speed
+            item.quality = max(min(item.quality + degrade_speed, 50), 0)
 
 
 class Item:
