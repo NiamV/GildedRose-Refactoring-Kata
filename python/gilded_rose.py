@@ -6,12 +6,13 @@ class GildedRose(object):
         self.items = items
 
     def update_quality(self):
+        improving_items = ["Aged Brie", "Backstage passes to a TAFKAL80ETC concert"]
+        constant_items = ["Sulfuras, Hand of Ragnaros"]
+
         for item in self.items:
-            if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert":
-                if item.quality > 0:
-                    if item.name != "Sulfuras, Hand of Ragnaros":
-                        item.quality = item.quality - 1
-            else:
+            if (not item.name in improving_items + constant_items) and item.quality > 0:
+                item.quality = item.quality - 1
+            elif not item.name in constant_items:
                 if item.quality < 50:
                     item.quality = item.quality + 1
                     if item.name == "Backstage passes to a TAFKAL80ETC concert":
