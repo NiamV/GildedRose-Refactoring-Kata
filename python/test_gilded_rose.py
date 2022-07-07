@@ -70,7 +70,11 @@ class GildedRoseTest(unittest.TestCase):
         gilded_rose.update_quality()
         self.assertEqual(items[0].quality, 0)
 
-
+    def test_conjured_degrades_doubly(self):
+        items = [Item("Conjured", 5, 2)]
+        gilded_rose = GildedRose(items)
+        gilded_rose.update_quality()
+        self.assertEqual(items[0].quality, 0)
 
 
 
