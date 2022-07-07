@@ -6,12 +6,14 @@ class GildedRose(object):
         self.items = items
 
     def increase_backstage_quality(self, item):
-        if item.sell_in < 6 and item.quality < 48:
-                item.quality += 3
-        elif item.sell_in < 11 and item.quality < 49:
-                item.quality += 2
-        elif item.quality < 50:
-            item.quality += 1
+        if item.sell_in < 0:
+            item.quality = 0
+        elif item.sell_in < 5:
+                item.quality = min(item.quality + 3, 50)
+        elif item.sell_in < 10:
+                item.quality = min(item.quality + 2, 50)
+        else:
+            item.quality = min(item.quality + 1, 50)
 
 
     def update_quality(self):
@@ -19,27 +21,23 @@ class GildedRose(object):
         constant_items = ["Sulfuras, Hand of Ragnaros"]
 
         for item in self.items:
+            if item.name != "Sulfuras, Hand of Ragnaros":
+                item.sell_in = item.sell_in - 1
+
             if (not item.name in improving_items + constant_items) and item.quality > 0:
                 item.quality = item.quality - 1
+
             elif not item.name in constant_items:
                 if item.quality < 50 and item.name != "Backstage passes to a TAFKAL80ETC concert":
                     item.quality = item.quality + 1
                 else:
                     self.increase_backstage_quality(item)
 
-            if item.name != "Sulfuras, Hand of Ragnaros":
-                item.sell_in = item.sell_in - 1
             if item.sell_in < 0:
-                if item.name != "Aged Brie":
-                    if item.name != "Backstage passes to a TAFKAL80ETC concert":
-                        if item.quality > 0:
-                            if item.name != "Sulfuras, Hand of Ragnaros":
-                                item.quality = item.quality - 1
-                    else:
-                        item.quality = item.quality - item.quality
-                else:
-                    if item.quality < 50:
-                        item.quality = item.quality + 1
+                if (not item.name in improving_items + constant_items) and item.quality > 0:
+                    item.quality = item.quality - 1
+                elif item.quality < 50 and item.name != "Backstage passes to a TAFKAL80ETC concert":
+                    item.quality = item.quality + 1
 
 
 class Item:
